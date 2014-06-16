@@ -231,7 +231,9 @@ class Ec2Inventory(object):
         self.cache_path_cache = cache_dir + "/ansible-ec2.cache"
         self.cache_path_index = cache_dir + "/ansible-ec2.index"
         self.cache_max_age = config.getint('ec2', 'cache_max_age')
-        
+
+        # EC2 running
+        self.ec2_enable_stopped = config.getboolean('ec2', 'enable_stopped')
 
 
     def parse_cli_args(self):
@@ -328,7 +330,7 @@ class Ec2Inventory(object):
         addressable '''
 
         # Only want running instances
-        if instance.state != 'running':
+        if not self.ec2_enable_stopped and instance.state != 'running':
             return
 
         # Select the best destination address
